@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuwoSpace Mission Control</title>
+    <!-- Modern typography and high-performance charting libraries -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <script src="https://jsdelivr.net"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #060913;
+            --panel-bg: rgba(18, 22, 41, 0.75);
+            --panel-border: rgba(255, 255, 255, 0.07);
+            --accent-glow: #7928ca;
+            --accent-cyan: #00f2fe;
+            --accent-orange: #ff9f43;
+            --text-main: #f5f6fa;
+            --text-muted: #a0aec0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- LOGO & COMPANY HEADER --- */
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .brand-logo {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.5));
+        }
+
+        .brand-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- DASHBOARD WRAPPER --- */
+        .dashboard-container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- GLASSMORPHISM PANEL --- */
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .panel-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- SYSTEM METRICS GRID --- */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* --- HEAVY-DUTY COMMAND BUTTON --- */
+        .ignition-button {
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--accent-orange);
+            color: var(--accent-orange);
+            font-family: 'Orbitron', sans-serif;
+            padding: 18px;
+            font-size: 14px;
+            font-weight: 800;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ignition-button:hover {
+            background: rgba(255, 159, 67, 0.08);
+            box-shadow: 0 0 20px rgba(255, 159, 67, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .ignition-button.firing-state {
+            background: var(--accent-orange);
+            color: #000000;
+            box-shadow: 0 0 30px var(--accent-orange);
+            border-color: var(--accent-orange);
+            pointer-events: none;
+            transform: scale(0.98);
+        }
+
+        /* --- GRAPHICAL DATA AREA --- */
+        .chart-wrapper {
+            height: 160px;
+            position: relative;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section for Logo and Name -->
+    <header class="brand-header">
+        <!-- Make sure your custom company image asset is named logo.png inside your directory -->
+        <img class="brand-logo" src="logo.png" alt="🚀">
+        <h1 class="brand-name">RuwoSpace</h1>
+    </header>
+
+    <main class="dashboard-container">
+        
+        <!-- Controls & Environment Panel -->
+        <section class="glass-panel">
+            <div class="panel-heading">⚡ Main Propulsion Controls</div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Node Status</div>
+                    <div class="metric-value" id="systemStatus" style="color: #4cd137;">ONLINE</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Signal Range</div>
+                    <div class="metric-value">~ 80 Meters</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Target Pin</div>
+                    <div class="metric-value">V1 (Relay)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Burn Limit</div>
+                    <div class="metric-value">5.00 Seconds</div>
+                </div>
+            </div>
+            
+            <!-- Actuator Control Button -->
+            <button class="ignition-button" id="fireControlBtn" onclick="executeIgnitionSequence()">
+                Execute Ignition
+            </button>
+        </section>
+
+        <!-- Dynamic Graph Data Tracking Panel -->
+        <section class="glass-panel">
+            <div class="panel-heading">📊 Live Motor Telemetry Curve</div>
+            <div class="chart-wrapper">
+                <canvas id="realtimeTelemetryChart"></canvas>
+            </div>
+        </section>
+
+    </main>
+
+<script>
+    // ==========================================
+    // 🛠️ CONFIGURATION - PASTE YOUR BLYNK TOKEN HERE
+    // ==========================================
+    const BLYNK_AUTH_TOKEN = "J2zV0s9AFVa78KxMGEJGY8DDNNRQ5J5T"; 
+    const VIRTUAL_PIN = "v1";
+
+    // Initialize Chart.js configuration parameters
+    const ctx = document.getElementById('realtimeTelemetryChart').getContext('2d');
+    const telemetryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['0s', '1s', '2s', '3s', '4s', '5s'],
+            datasets: [{
+                label: 'Load / Thrust (N)',
+                data:,
+                borderColor: '#00f2fe',
+                borderWidth: 2,
+                backgroundColor: 'rgba(0, 242, 254, 0.04)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#a0aec0', font: { size: 10 } } },
+                y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#a0aec0', font: { size: 10 } } }
+            }
+        }
+    });
+
+    // Main API Execution logic loop
+    function executeIgnitionSequence() {
+        const btn = document.getElementById('fireControlBtn');
+        const statusText = document.getElementById('systemStatus');
+        
+        // 1. Immediately change UI state for ultra-fast user feedback
+        btn.classList.add('firing-state');
+        btn.innerText = "BURNING: 5.00s";
+        statusText.innerText = "FIRING";
+        statusText.style.color = "#ff9f43";
+
+        // 2. Formulate high-priority REST HTTP Web request directly to Blynk cloud engine
+        const endpointUrl = `https://blynk.cloud{BLYNK_AUTH_TOKEN}&${VIRTUAL_PIN}=1`;
+        
+        fetch(endpointUrl)
+            .then(response => {
+                if (response.ok) {
+                    // Update graph and start local high-precision countdown
+                    runVisualCountdown(5, btn, statusText);
+                } else {
+                    handleExecutionFailure(btn, statusText, "API ERROR");
+                }
+            })
+            .catch(error => {
+                handleExecutionFailure(btn, statusText, "NET OFFLINE");
+            });
+    }
+
+    // High precision countdown timer execution function
+    function runVisualCountdown(durationSeconds, buttonElement, statusElement) {
+        let secondsLeft = durationSeconds;
+        
+        // Mock curve array values mapping out live active load telemetry over 5s
+        telemetryChart.data.datasets[0].data =;
+        telemetryChart.update();
+
